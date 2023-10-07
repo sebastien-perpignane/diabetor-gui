@@ -5,6 +5,7 @@ module.exports = {
       '<rootDir>/jest/fileMock.js',
   },
   collectCoverageFrom: ['src/**/*.ts*', 'src/**/*.js*'],
+  coveragePathIgnorePatterns: ['styles.ts'],
   fakeTimers: {
     enableGlobally: true,
   },

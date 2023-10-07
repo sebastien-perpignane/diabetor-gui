@@ -5,12 +5,10 @@ import {
   Text,
   Vibration,
   View,
-  useColorScheme,
+  Appearance,
 } from 'react-native'
 import {SafeAreaView} from 'react-native-safe-area-context'
-import {Section} from '../components/SectionComponent'
 import {Colors} from 'react-native/Libraries/NewAppScreen'
-import {useState} from 'react'
 import {
   AcetoneNeededError,
   PuntualAdaptationResult,
@@ -18,167 +16,200 @@ import {
 } from '../core/QuickInsulin'
 import {DbNumericTextInput} from '../components/DbNumericTextInputComponent'
 import {DbButton} from '../components/DbButtonComponent'
+import {screenStyles} from './styles'
 
-function formatResult(
-  punctualAdaptationResult: PuntualAdaptationResult,
-): string {
-  return `
-    glycemia adaptation: ${punctualAdaptationResult.glycemiaAdaptation}
-    acetone adaptation: ${punctualAdaptationResult.acetoneAdaptation}
-  `
+interface PunctualGlycemiaState {
+  glycemiaLevel: number | undefined
+  acetoneLevel: number | undefined
+  punctualAdaptationResult: PuntualAdaptationResult | null
+  visibleAcetone: boolean
+  errorMessage: string
 }
 
-export function PunctualGlycemiaScreen() {
-  const isDarkMode = useColorScheme() === 'dark'
+export class PunctualGlycemiaScreen extends React.Component<
+  {},
+  PunctualGlycemiaState
+> {
+  constructor(props: {}) {
+    super(props)
 
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
+    this.state = {
+      glycemiaLevel: undefined,
+      acetoneLevel: undefined,
+      punctualAdaptationResult: null,
+      visibleAcetone: false,
+      errorMessage: '',
+    }
   }
 
-  const [glycemia, setGlycemia] = useState<number | undefined>(undefined)
-  const [acetoneLevel, setAcetoneLevel] = useState<number | undefined>(
-    undefined,
-  )
-  const [punctualAdaptationResult, setPunctualAdaptationResult] =
-    useState<PuntualAdaptationResult | null>(null)
-  const [visibleAcetone, setVisibleAcetone] = useState(false)
-  const [errorMessage, setErrorMessage] = useState('')
+  formatResult = (
+    punctualAdaptationResult: PuntualAdaptationResult,
+  ): string => {
+    return `
+      glycemia adaptation: ${punctualAdaptationResult.glycemiaAdaptation}
+      acetone adaptation: ${punctualAdaptationResult.acetoneAdaptation}
+    `
+  }
 
-  const manageNumberInput = (
+  setGlycemiaLevel = (glycemiaLevel: number | undefined): void => {
+    this.setState({
+      glycemiaLevel: glycemiaLevel,
+    })
+  }
+
+  setAcetoneLevel = (acetoneLevel: number | undefined): void => {
+    this.setState({
+      acetoneLevel: acetoneLevel,
+    })
+  }
+
+  manageNumberInput = (
     strValue: string,
-    setValueFunction: (num: number | undefined) => void,
-  ) => {
+    setValueFunction: (value: number | undefined) => void,
+  ): void => {
     if (!strValue) {
       setValueFunction(undefined)
       return
     }
-    let numberValue: number = Number(strValue) //parseFloat(glycemiaStr)
+    let numberValue: number = Number(strValue)
     if (isNaN(numberValue) || !isFinite(numberValue)) {
-      setErrorMessage('Invalid number')
+      this.setErrorMessage('Invalid number')
     } else {
       setValueFunction(numberValue)
-      manageValidation()
-      setErrorMessage('')
+      this.manageValidation()
+      this.setErrorMessage('')
     }
   }
 
-  const manageValidation = () => {
-    if (glycemia === undefined) {
-      setPunctualAdaptationResult(null)
+  setPunctualAdaptationResult = (
+    punctualAdaptationResult: PuntualAdaptationResult | null,
+  ): void => {
+    this.setState({
+      punctualAdaptationResult: punctualAdaptationResult,
+    })
+  }
+
+  setVisibleAcetone = (visible: boolean) => {
+    this.setState({visibleAcetone: visible})
+  }
+
+  setErrorMessage = (errorMessage: string) => {
+    this.setState({
+      errorMessage: errorMessage,
+    })
+  }
+
+  manageValidation = (): void => {
+    if (this.state.glycemiaLevel === undefined) {
+      this.setPunctualAdaptationResult(null)
       return
     }
 
     let quickInsulin = new QuickInsulin()
     try {
       let lPunctualAdaptationResult = quickInsulin.computePunctualAdaptation(
-        glycemia,
-        acetoneLevel,
+        this.state.glycemiaLevel,
+        this.state.acetoneLevel,
       )
-      setPunctualAdaptationResult(lPunctualAdaptationResult)
+      this.setPunctualAdaptationResult(lPunctualAdaptationResult)
     } catch (e) {
       if (e instanceof AcetoneNeededError) {
         try {
           Vibration.vibrate()
         } catch (ve) {}
 
-        setVisibleAcetone(true)
+        this.setVisibleAcetone(true)
       } else {
-        setAcetoneLevel(0)
-        setVisibleAcetone(false)
-        setPunctualAdaptationResult(null)
+        this.setAcetoneLevel(undefined)
+        this.setVisibleAcetone(false)
+        this.setPunctualAdaptationResult(null)
       }
     }
   }
 
-  return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="">
-            <View
-              style={{
-                borderColor: Colors.black,
-                borderStyle: 'solid',
-                borderWidth: 2,
-              }}>
-              <Text>Glycemia level:</Text>
-              <DbNumericTextInput
-                id="glycemia"
-                keyboardType="numeric"
-                onChangeText={newText =>
-                  manageNumberInput(newText, setGlycemia)
-                }
-                testID="glycemiaInput"
-                defaultValue={glycemia == null ? '' : glycemia.toString()}
-              />
+  render(): JSX.Element {
+    const isDarkMode = Appearance.getColorScheme() === 'dark'
 
-              {visibleAcetone && (
-                <View>
-                  <Text>Acetone level:</Text>
-                  <DbNumericTextInput
-                    id="acetone"
-                    placeholder="Enter acetone level"
-                    onChangeText={newText =>
-                      manageNumberInput(newText, setAcetoneLevel)
-                    }
-                    testID="acetoneInput"
-                    defaultValue={
-                      acetoneLevel == null ? '' : acetoneLevel.toString()
-                    }
-                  />
-                </View>
-              )}
+    const backgroundStyle = {
+      backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
+    }
+
+    return (
+      <SafeAreaView style={screenStyles.screenBackground}>
+        <StatusBar
+          barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+          backgroundColor={backgroundStyle.backgroundColor}
+        />
+        <ScrollView
+          contentInsetAdjustmentBehavior="automatic"
+          style={backgroundStyle}>
+          <View>
+            <Text>Glycemia level:</Text>
+            <DbNumericTextInput
+              id="glycemia"
+              keyboardType="numeric"
+              onChangeText={newText =>
+                this.manageNumberInput(newText, this.setGlycemiaLevel)
+              }
+              testID="glycemiaInput"
+              defaultValue={
+                this.state.glycemiaLevel == null
+                  ? ''
+                  : this.state.glycemiaLevel.toString()
+              }
+            />
+          </View>
+
+          {this.state.visibleAcetone && (
+            <View>
+              <Text>Acetone level:</Text>
+              <DbNumericTextInput
+                id="acetone"
+                placeholder="Enter acetone level"
+                onChangeText={newText =>
+                  this.manageNumberInput(newText, this.setAcetoneLevel)
+                }
+                testID="acetoneInput"
+                defaultValue={
+                  this.state.acetoneLevel == null
+                    ? ''
+                    : this.state.acetoneLevel.toString()
+                }
+              />
             </View>
-          </Section>
-          <Section title="">
+          )}
+
+          <View>
             <DbButton
               title="Validate"
               testID="validateButton"
-              onPress={manageValidation}
+              onPress={this.manageValidation}
             />
-          </Section>
-          <Section title="">
-            <View
-              style={{
-                borderColor: Colors.black,
-                borderStyle: 'solid',
-                borderWidth: 2,
-              }}>
-              <Text>Insulin adaptation:</Text>
-              <Text style={{padding: 10, fontSize: 42}} testID="adaptationText">
-                {punctualAdaptationResult
-                  ? (punctualAdaptationResult?.totalAdaptation < 0 ? '' : '+') +
-                    punctualAdaptationResult?.totalAdaptation
-                  : ''}
+          </View>
+
+          {this.state.punctualAdaptationResult && (
+            <View>
+              <Text testID="adaptationText">
+                {this.state.punctualAdaptationResult?.totalAdaptation?.toString()}
               </Text>
             </View>
-          </Section>
-          {errorMessage && (
-            <Section title="errors">
-              <View>
-                <Text testID="errorMessage">{errorMessage}</Text>
-              </View>
-            </Section>
           )}
 
-          {punctualAdaptationResult != null && (
-            <Section title="Details">
+          {this.state.punctualAdaptationResult != null && (
+            <View>
               <Text testID="resultDetails">
-                {formatResult(punctualAdaptationResult)}
+                {this.formatResult(this.state.punctualAdaptationResult)}
               </Text>
-            </Section>
+            </View>
           )}
-        </View>
-      </ScrollView>
-    </SafeAreaView>
-  )
+
+          {this.state.errorMessage && (
+            <View>
+              <Text testID="errorMessage">{this.state.errorMessage}</Text>
+            </View>
+          )}
+        </ScrollView>
+      </SafeAreaView>
+    )
+  }
 }

@@ -5,5 +5,5 @@ module.exports = {
     semi: 'off',
     '@typescript-eslint/semi': ['error', 'never'],
   },
-  ignorePatterns: ['coverage/*'],
+  ignorePatterns: ['coverage/*', 'jest/*'],
 }

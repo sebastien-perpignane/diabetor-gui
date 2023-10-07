@@ -1,12 +1,13 @@
 import React from 'react'
 import {SafeAreaView, ScrollView, View} from 'react-native'
 import {DbButton} from '../components/DbButtonComponent'
+import {screenStyles} from './styles'
 
-export function HomeScreen({navigation}: any) {
+export function HomeScreen({navigation}: any): JSX.Element {
   return (
-    <SafeAreaView style={{backgroundColor: 'black'}}>
+    <SafeAreaView style={screenStyles.screenBackground}>
       <ScrollView>
-        <View style={{margin: 8, width: '80%', alignItems: 'center'}}>
+        <View style={screenStyles.buttonListContainer}>
           <DbButton
             title="Punctual quick adaptation"
             testID="punctual"

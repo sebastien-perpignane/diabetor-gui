@@ -42,34 +42,34 @@ it('displays results when acetone not needed and entered glycemia is valid', () 
 it('displays acetone input when needed', () => {
   let SampleScreen = () => <PunctualGlycemiaScreen />
 
-  let root = render(<SampleScreen />)
+  render(<SampleScreen />)
 
-  let glycemiaInput = root.getByTestId('glycemiaInput')
-  let validateButton = root.getByTestId('validateButton')
+  let glycemiaInput = screen.getByTestId('glycemiaInput')
+  let validateButton = screen.getByTestId('validateButton')
 
   expect(glycemiaInput).toBeDefined()
 
   fireEvent.changeText(glycemiaInput, '2.6')
   fireEvent(validateButton, 'onPress')
 
-  let acetoneInput = root.getByTestId('acetoneInput')
+  let acetoneInput = screen.getByTestId('acetoneInput')
   expect(acetoneInput).toBeDefined()
 })
 
 it('displays results when glycemia + acetone inputs are needed', () => {
   let SampleScreen = () => <PunctualGlycemiaScreen />
 
-  let root = render(<SampleScreen />)
+  render(<SampleScreen />)
 
-  let glycemiaInput = root.getByTestId('glycemiaInput')
-  let validateButton = root.getByTestId('validateButton')
+  let glycemiaInput = screen.getByTestId('glycemiaInput')
+  let validateButton = screen.getByTestId('validateButton')
 
   expect(glycemiaInput).toBeDefined()
 
   fireEvent.changeText(glycemiaInput, '2.6')
   fireEvent(validateButton, 'onPress')
 
-  let acetoneInput = root.getByTestId('acetoneInput')
+  let acetoneInput = screen.getByTestId('acetoneInput')
   expect(acetoneInput).toBeDefined()
 
   fireEvent.changeText(acetoneInput, '1')
@@ -86,17 +86,17 @@ it('displays results when glycemia + acetone inputs are needed', () => {
 it('displays error message when entered glycemia is not valid', () => {
   let SampleScreen = () => <PunctualGlycemiaScreen />
 
-  let root = render(<SampleScreen />)
+  render(<SampleScreen />)
 
-  let glycemiaInput = root.getByTestId('glycemiaInput')
-  let validateButton = root.getByTestId('validateButton')
+  let glycemiaInput = screen.getByTestId('glycemiaInput')
+  let validateButton = screen.getByTestId('validateButton')
 
   expect(glycemiaInput).toBeDefined()
 
   fireEvent.changeText(glycemiaInput, 'abc')
   fireEvent(validateButton, 'onPress')
 
-  let errorMessage = root.getByTestId('errorMessage')
+  let errorMessage = screen.getByTestId('errorMessage')
 
   expect(errorMessage.props.children).toEqual('Invalid number')
 })
@@ -104,10 +104,10 @@ it('displays error message when entered glycemia is not valid', () => {
 it('does not update anything when entered glycemia is empty', () => {
   let SampleScreen = () => <PunctualGlycemiaScreen />
 
-  let root = render(<SampleScreen />)
+  render(<SampleScreen />)
 
-  let glycemiaInput = root.getByTestId('glycemiaInput')
-  let validateButton = root.getByTestId('validateButton')
+  let glycemiaInput = screen.getByTestId('glycemiaInput')
+  let validateButton = screen.getByTestId('validateButton')
 
   expect(glycemiaInput).toBeDefined()
 
