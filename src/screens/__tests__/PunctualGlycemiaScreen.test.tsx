@@ -12,25 +12,23 @@ import {PunctualGlycemiaScreen} from '../PunctualGlycemiaScreen'
 it('renders correctly', () => {
   let SampleScreen = () => <PunctualGlycemiaScreen />
 
-  let root = render(<SampleScreen />)
+  render(<SampleScreen />)
 
-  expect(root.getByTestId('glycemiaInput')).toBeDefined()
-  expect(() => root.getByTestId('acetoneInput')).toThrowError()
-  expect(() => root.getByTestId('resultDetails')).toThrowError()
+  expect(screen.getByTestId('glycemiaInput')).toBeDefined()
+  expect(() => screen.getByTestId('acetoneInput')).toThrowError()
+  expect(() => screen.getByTestId('resultDetails')).toThrowError()
 })
 
 it('displays results when acetone not needed and entered glycemia is valid', () => {
   let SampleScreen = () => <PunctualGlycemiaScreen />
 
-  let root = render(<SampleScreen />)
+  render(<SampleScreen />)
 
-  let glycemiaInput = root.getByTestId('glycemiaInput')
-  let validateButton = root.getByTestId('validateButton')
+  let glycemiaInput = screen.getByTestId('glycemiaInput')
 
   expect(glycemiaInput).toBeDefined()
 
   fireEvent.changeText(glycemiaInput, '1.2')
-  fireEvent(validateButton, 'onPress')
 
   let adaptationText = screen.getByTestId('adaptationText')
   expect(adaptationText.props.children).toBeTruthy()
@@ -45,12 +43,10 @@ it('displays acetone input when needed', () => {
   render(<SampleScreen />)
 
   let glycemiaInput = screen.getByTestId('glycemiaInput')
-  let validateButton = screen.getByTestId('validateButton')
 
   expect(glycemiaInput).toBeDefined()
 
   fireEvent.changeText(glycemiaInput, '2.6')
-  fireEvent(validateButton, 'onPress')
 
   let acetoneInput = screen.getByTestId('acetoneInput')
   expect(acetoneInput).toBeDefined()
@@ -62,19 +58,15 @@ it('displays results when glycemia + acetone inputs are needed', () => {
   render(<SampleScreen />)
 
   let glycemiaInput = screen.getByTestId('glycemiaInput')
-  let validateButton = screen.getByTestId('validateButton')
 
   expect(glycemiaInput).toBeDefined()
 
   fireEvent.changeText(glycemiaInput, '2.6')
-  fireEvent(validateButton, 'onPress')
 
   let acetoneInput = screen.getByTestId('acetoneInput')
   expect(acetoneInput).toBeDefined()
 
   fireEvent.changeText(acetoneInput, '1')
-
-  fireEvent(validateButton, 'onPress')
 
   let adaptationText = screen.getByTestId('adaptationText')
   expect(adaptationText.props.children).toBeTruthy()
@@ -89,16 +81,16 @@ it('displays error message when entered glycemia is not valid', () => {
   render(<SampleScreen />)
 
   let glycemiaInput = screen.getByTestId('glycemiaInput')
-  let validateButton = screen.getByTestId('validateButton')
 
   expect(glycemiaInput).toBeDefined()
 
   fireEvent.changeText(glycemiaInput, 'abc')
-  fireEvent(validateButton, 'onPress')
 
   let errorMessage = screen.getByTestId('errorMessage')
 
-  expect(errorMessage.props.children).toEqual('Invalid number')
+  console.log(errorMessage.props.children)
+
+  expect(errorMessage.props.children).toEqual('Invalid glycemia level')
 })
 
 it('does not update anything when entered glycemia is empty', () => {
@@ -107,12 +99,10 @@ it('does not update anything when entered glycemia is empty', () => {
   render(<SampleScreen />)
 
   let glycemiaInput = screen.getByTestId('glycemiaInput')
-  let validateButton = screen.getByTestId('validateButton')
 
   expect(glycemiaInput).toBeDefined()
 
   fireEvent.changeText(glycemiaInput, '')
-  fireEvent(validateButton, 'onPress')
 
   expect(glycemiaInput.props.children).toBeUndefined()
 })

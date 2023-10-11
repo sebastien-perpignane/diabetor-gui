@@ -4,10 +4,16 @@ import conditions from './quick_insulin_conditions.json'
 export class PuntualAdaptationResult {
   private _glycemiaAdaptation: number
   private _acetoneAdaptation: number
+  private _checkAcetone: boolean
 
-  constructor(glycemiaAdapation: number, acetoneAdaptation: number) {
+  constructor(
+    glycemiaAdapation: number,
+    acetoneAdaptation: number,
+    checkAcetone: boolean,
+  ) {
     this._glycemiaAdaptation = glycemiaAdapation
     this._acetoneAdaptation = acetoneAdaptation
+    this._checkAcetone = checkAcetone
   }
 
   public get glycemiaAdaptation() {
@@ -20,6 +26,10 @@ export class PuntualAdaptationResult {
 
   public get totalAdaptation() {
     return this.acetoneAdaptation + this.glycemiaAdaptation
+  }
+
+  public get checkAcetone() {
+    return this._checkAcetone
   }
 }
 
@@ -37,11 +47,11 @@ export class QuickInsulin {
 
     if (!glycemiaCondition) {
       throw new Error(
-        'No adaptation found. Check quick insulin conditions config',
+        'No adaptation found. Check quick insulin conditions configuration',
       )
     }
 
-    if (glycemiaCondition.checkAcetone && acetoneLevel == null) {
+    if (glycemiaCondition.checkAcetone && acetoneLevel === undefined) {
       throw new AcetoneNeededError('Please provide acetone level')
     }
 
@@ -55,6 +65,9 @@ export class QuickInsulin {
     return new PuntualAdaptationResult(
       glycemiaCondition.adaptation,
       acetoneAdaptation,
+      glycemiaCondition.checkAcetone === undefined
+        ? false
+        : glycemiaCondition.checkAcetone,
     )
   }
 }

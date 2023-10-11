@@ -15,7 +15,6 @@ import {
   QuickInsulin,
 } from '../core/QuickInsulin'
 import {DbNumericTextInput} from '../components/DbNumericTextInputComponent'
-import {DbButton} from '../components/DbButtonComponent'
 import {screenStyles} from './styles'
 
 interface PunctualGlycemiaState {
@@ -51,37 +50,88 @@ export class PunctualGlycemiaScreen extends React.Component<
     `
   }
 
-  setGlycemiaLevel = (glycemiaLevel: number | undefined): void => {
+  private manageInvalidGlycemia = () => {
+    this.setVisibleAcetone(false)
+    this.setAcetoneLevel(undefined)
+    this.setErrorMessage('Invalid glycemia level')
+    this.setPunctualAdaptationResult(null)
+  }
+
+  private setGlycemiaLevel = (glycemiaLevel: number | undefined): void => {
+    console.log('setting glycemia level')
     this.setState({
       glycemiaLevel: glycemiaLevel,
     })
   }
 
-  setAcetoneLevel = (acetoneLevel: number | undefined): void => {
+  private setAcetoneLevel = (acetoneLevel: number | undefined): void => {
     this.setState({
       acetoneLevel: acetoneLevel,
     })
   }
 
-  manageNumberInput = (
-    strValue: string,
-    setValueFunction: (value: number | undefined) => void,
-  ): void => {
-    if (!strValue) {
-      setValueFunction(undefined)
-      return
-    }
-    let numberValue: number = Number(strValue)
-    if (isNaN(numberValue) || !isFinite(numberValue)) {
-      this.setErrorMessage('Invalid number')
-    } else {
-      setValueFunction(numberValue)
-      this.manageValidation()
+  private computeAdaptation = (
+    glycemiaLevel: number,
+    acetoneLevel: number | undefined,
+  ) => {
+    let quickInsulin = new QuickInsulin()
+    try {
+      let lPunctualAdaptationResult = quickInsulin.computePunctualAdaptation(
+        glycemiaLevel,
+        acetoneLevel,
+      )
+      this.setPunctualAdaptationResult(lPunctualAdaptationResult)
+      this.setVisibleAcetone(lPunctualAdaptationResult.checkAcetone)
       this.setErrorMessage('')
+    } catch (e: any) {
+      if (e instanceof AcetoneNeededError) {
+        try {
+          Vibration.vibrate()
+        } catch (ve) {}
+        this.setVisibleAcetone(true)
+        this.setErrorMessage('Please provide acetone level')
+      } else {
+        this.setErrorMessage(e.toString())
+      }
+      this.setPunctualAdaptationResult(null)
     }
   }
 
-  setPunctualAdaptationResult = (
+  private manageGlycemiaLevelInput = (newText: string) => {
+    let glycemiaLevel = this.manageNumberInput(newText)
+
+    if (glycemiaLevel === undefined) {
+      this.manageInvalidGlycemia()
+      return
+    }
+
+    this.setGlycemiaLevel(glycemiaLevel)
+
+    this.computeAdaptation(glycemiaLevel, this.state.acetoneLevel)
+  }
+
+  private manageAcetoneLevelInput = (newText: string) => {
+    let acetoneLevel = this.manageNumberInput(newText)
+    this.setAcetoneLevel(acetoneLevel)
+    if (this.state.glycemiaLevel) {
+      this.computeAdaptation(this.state.glycemiaLevel, acetoneLevel)
+    }
+  }
+
+  private manageNumberInput = (strValue: string): number | undefined => {
+    if (!strValue) {
+      return undefined
+    }
+    let numberValue: number = Number(strValue)
+    if (isNaN(numberValue) || !isFinite(numberValue)) {
+      return undefined
+    } else {
+      this.setErrorMessage('')
+      return numberValue
+    }
+  }
+
+  private setPunctualAdaptationResult = (
     punctualAdaptationResult: PuntualAdaptationResult | null,
   ): void => {
     this.setState({
@@ -89,42 +139,14 @@ export class PunctualGlycemiaScreen extends React.Component<
     })
   }
 
-  setVisibleAcetone = (visible: boolean) => {
+  private setVisibleAcetone = (visible: boolean) => {
     this.setState({visibleAcetone: visible})
   }
 
-  setErrorMessage = (errorMessage: string) => {
+  private setErrorMessage = (errorMessage: string) => {
     this.setState({
       errorMessage: errorMessage,
     })
-  }
-
-  manageValidation = (): void => {
-    if (this.state.glycemiaLevel === undefined) {
-      this.setPunctualAdaptationResult(null)
-      return
-    }
-
-    let quickInsulin = new QuickInsulin()
-    try {
-      let lPunctualAdaptationResult = quickInsulin.computePunctualAdaptation(
-        this.state.glycemiaLevel,
-        this.state.acetoneLevel,
-      )
-      this.setPunctualAdaptationResult(lPunctualAdaptationResult)
-    } catch (e) {
-      if (e instanceof AcetoneNeededError) {
-        try {
-          Vibration.vibrate()
-        } catch (ve) {}
-
-        this.setVisibleAcetone(true)
-      } else {
-        this.setAcetoneLevel(undefined)
-        this.setVisibleAcetone(false)
-        this.setPunctualAdaptationResult(null)
-      }
-    }
   }
 
   render(): JSX.Element {
@@ -147,16 +169,8 @@ export class PunctualGlycemiaScreen extends React.Component<
             <Text>Glycemia level:</Text>
             <DbNumericTextInput
               id="glycemia"
-              keyboardType="numeric"
-              onChangeText={newText =>
-                this.manageNumberInput(newText, this.setGlycemiaLevel)
-              }
+              onChangeText={newText => this.manageGlycemiaLevelInput(newText)}
               testID="glycemiaInput"
-              defaultValue={
-                this.state.glycemiaLevel == null
-                  ? ''
-                  : this.state.glycemiaLevel.toString()
-              }
             />
           </View>
 
@@ -166,31 +180,16 @@ export class PunctualGlycemiaScreen extends React.Component<
               <DbNumericTextInput
                 id="acetone"
                 placeholder="Enter acetone level"
-                onChangeText={newText =>
-                  this.manageNumberInput(newText, this.setAcetoneLevel)
-                }
+                onChangeText={newText => this.manageAcetoneLevelInput(newText)}
                 testID="acetoneInput"
-                defaultValue={
-                  this.state.acetoneLevel == null
-                    ? ''
-                    : this.state.acetoneLevel.toString()
-                }
               />
             </View>
           )}
 
-          <View>
-            <DbButton
-              title="Validate"
-              testID="validateButton"
-              onPress={this.manageValidation}
-            />
-          </View>
-
           {this.state.punctualAdaptationResult && (
             <View>
               <Text testID="adaptationText">
-                {this.state.punctualAdaptationResult?.totalAdaptation?.toString()}
+                {this.state.punctualAdaptationResult.totalAdaptation.toString()}
               </Text>
             </View>
           )}

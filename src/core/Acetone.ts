@@ -11,7 +11,11 @@ export class Acetone {
 
   public computeAdaptation(acetoneLevel: number): number {
     if (!this.acetoneAdaptationByLevel.has(acetoneLevel)) {
-      throw new Error('unknown acetone level: {acetoneLevel}')
+      let validLevels = [...this.acetoneAdaptationByLevel.keys()].join(', ')
+
+      throw new Error(
+        `Invalid acetone level: ${acetoneLevel}. Valid levels are: ${validLevels}`,
+      )
     }
 
     return this.acetoneAdaptationByLevel.get(acetoneLevel)
