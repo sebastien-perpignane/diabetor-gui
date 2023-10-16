@@ -4,7 +4,7 @@ import longtermAdaptationCriteria from './quick_insulin_longterm_adaptation_crit
 import {Trend, TrendService} from './TrendService'
 
 export interface GlycemiaObjective {
-  min: number,
+  min: number
   max: number
 }
 
@@ -19,14 +19,11 @@ export class MealGlycemiaMeasure {
   }
 
   private computeTrend(glycemiaObjective: GlycemiaObjective) {
-
     if (this._afterMealGlycemia > glycemiaObjective.max) {
       return Trend.UP
-    }
-    else if (this._afterMealGlycemia < glycemiaObjective.min) {
+    } else if (this._afterMealGlycemia < glycemiaObjective.min) {
       return Trend.DOWN
-    }
-    else {
+    } else {
       return Trend.STABLE
     }
   }
@@ -34,7 +31,6 @@ export class MealGlycemiaMeasure {
   public get trend() {
     return this._trend
   }
-
 }
 
 export class PuntualAdaptationResult {
@@ -72,7 +68,6 @@ export class PuntualAdaptationResult {
 }
 
 export class QuickInsulin {
-  
   public computePunctualAdaptation(
     glycemiaLevel: number,
     acetoneLevel?: number,
@@ -125,7 +120,6 @@ export class QuickInsulin {
   findObjectiveCriterion = () => {
     return punctualAdaptationCriteria.find(c => c.objective)
   }
-
 }
 
 export class AcetoneNeededError extends Error {

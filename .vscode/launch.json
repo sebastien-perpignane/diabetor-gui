@@ -12,13 +12,9 @@
         "<node_internals>/**"
       ],
       "env": {"CI": "true"},
-      //"runtimeExecutable": "${workspaceRoot}/node_modules/.bin/react-scripts",
       "args": ["--verbose", "-i", "--no-cache", "${workspaceFolder}/src/components/__tests__/DbTextInputComponent.test.tsx"],
       "console": "integratedTerminal",
       "program": "${workspaceRoot}/node_modules/.bin/jest",
-      // "outFiles": [
-      //   "${workspaceFolder}/**/*.js"
-      // ]
     }
   ]
 }

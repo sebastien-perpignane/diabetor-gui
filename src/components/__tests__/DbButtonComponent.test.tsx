@@ -31,7 +31,12 @@ it('renders correctly when pressed', async () => {
   let i = 0
 
   const Sample = () => (
-    <DbButton title="coucou" testID="coucou" testOnly_pressed={true} onPress={() => i++} />
+    <DbButton
+      title="coucou"
+      testID="coucou"
+      testOnly_pressed={true}
+      onPress={() => i++}
+    />
   )
 
   render(<Sample />)
