@@ -1,6 +1,7 @@
 import React from 'react'
 
-import {Pressable, PressableProps, StyleSheet, Text} from 'react-native'
+import {Pressable, PressableProps, StyleSheet} from 'react-native'
+import {Text} from 'react-native-paper'
 
 interface DbButtonProps extends PressableProps {
   title: string
@@ -9,14 +10,13 @@ interface DbButtonProps extends PressableProps {
 export function DbButton(props: DbButtonProps): JSX.Element {
   return (
     <Pressable
-      onPress={props.onPress}
       style={({pressed}) => [
         {
           backgroundColor: pressed ? 'darkturquoise' : 'blue',
         },
         styles.dbButton,
       ]}
-      testID={props.testID}>
+      {...props}>
       <Text style={styles.dbButtonText}>{props.title}</Text>
     </Pressable>
   )

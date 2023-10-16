@@ -1,0 +1,14 @@
+[
+  {
+    "trend": "UP",
+    "adaptation": 2
+  },
+  {
+    "trend": "DOWN",
+    "adaptation": -2
+  },
+  {
+    "trend": "STABLE",
+    "adaptation": 0
+  }
+]

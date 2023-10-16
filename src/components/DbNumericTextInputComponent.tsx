@@ -1,5 +1,5 @@
 import React from 'react'
-import {TextInputProps} from 'react-native'
+import {TextInputProps} from 'react-native-paper'
 import {DbTextInput} from './DbTextInputComponent'
 
 export function DbNumericTextInput(props: TextInputProps): JSX.Element {

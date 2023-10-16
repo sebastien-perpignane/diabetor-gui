@@ -1,0 +1,47 @@
+[
+  {
+    "max": 0.7,
+    "objective": false,
+    "adaptation": -1,
+    "endOfMeal": true,
+    "checkAcetone": false
+  },
+  {
+    "min": 0.7,
+    "max": 1.4,
+    "objective": true,
+    "adaptation": 0,
+    "endOfMeal": false,
+    "checkAcetone": false
+  },
+  {
+    "min": 1.4,
+    "max": 2.0,
+    "objective": false,
+    "adaptation": 1,
+    "endOfMeal": false,
+    "checkAcetone": false
+  },
+  {
+    "min": 2.0,
+    "max": 2.5,
+    "objective": false,
+    "adaptation": 2,
+    "endOfMeal": false,
+    "checkAcetone": false
+  },
+  {
+    "min": 2.5,
+    "max": 3.0,
+    "objective": false,
+    "adaptation": 3,
+    "endOfMeal": false,
+    "checkAcetone": true
+  },
+  {
+    "min": 3.0,
+    "objective": false,
+    "adaptation": 4,
+    "checkAcetone": true
+  }
+]

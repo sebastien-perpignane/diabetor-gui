@@ -1,5 +1,6 @@
 import React from 'react'
-import {StyleSheet, TextInput, TextInputProps} from 'react-native'
+import {TextInput, TextInputProps} from 'react-native-paper'
+import {StyleSheet} from 'react-native'
 
 export function DbTextInput(props: TextInputProps): JSX.Element {
   let localProps

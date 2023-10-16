@@ -12,10 +12,33 @@ import {it, expect} from '@jest/globals'
 import {fireEvent, render, screen} from '@testing-library/react-native'
 
 it('renders correctly', async () => {
-  const Sample = () => <DbButton title="coucou" testID="coucou" />
+  let i = 0
+
+  const Sample = () => (
+    <DbButton title="coucou" testID="coucou" onPress={() => i++} />
+  )
 
   render(<Sample />)
+
   let punctualButton = screen.getByTestId('coucou')
   expect(punctualButton).toBeDefined()
+
   fireEvent(punctualButton, 'onPress')
+  expect(i).toEqual(1)
+})
+
+it('renders correctly when pressed', async () => {
+  let i = 0
+
+  const Sample = () => (
+    <DbButton title="coucou" testID="coucou" testOnly_pressed={true} onPress={() => i++} />
+  )
+
+  render(<Sample />)
+
+  let punctualButton = screen.getByTestId('coucou')
+  expect(punctualButton).toBeDefined()
+
+  fireEvent(punctualButton, 'onPress')
+  expect(i).toEqual(1)
 })

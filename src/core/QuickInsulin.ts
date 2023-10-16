@@ -1,9 +1,46 @@
 import {Acetone} from './Acetone'
-import conditions from './quick_insulin_conditions.json'
+import punctualAdaptationCriteria from './quick_insulin_punctual_adaptation_criteria.json'
+import longtermAdaptationCriteria from './quick_insulin_longterm_adaptation_criteria.json'
+import {Trend, TrendService} from './TrendService'
+
+export interface GlycemiaObjective {
+  min: number,
+  max: number
+}
+
+export class MealGlycemiaMeasure {
+  private _afterMealGlycemia: number
+  private _trend: Trend
+
+  constructor(afterMealGlycemia: number, objective: GlycemiaObjective) {
+    this._afterMealGlycemia = afterMealGlycemia
+    let {min, max} = objective
+    this._trend = this.computeTrend({min, max})
+  }
+
+  private computeTrend(glycemiaObjective: GlycemiaObjective) {
+
+    if (this._afterMealGlycemia > glycemiaObjective.max) {
+      return Trend.UP
+    }
+    else if (this._afterMealGlycemia < glycemiaObjective.min) {
+      return Trend.DOWN
+    }
+    else {
+      return Trend.STABLE
+    }
+  }
+
+  public get trend() {
+    return this._trend
+  }
+
+}
 
 export class PuntualAdaptationResult {
   private _glycemiaAdaptation: number
   private _acetoneAdaptation: number
+  private _totalAdaptation: number
   private _checkAcetone: boolean
 
   constructor(
@@ -14,6 +51,7 @@ export class PuntualAdaptationResult {
     this._glycemiaAdaptation = glycemiaAdapation
     this._acetoneAdaptation = acetoneAdaptation
     this._checkAcetone = checkAcetone
+    this._totalAdaptation = acetoneAdaptation + glycemiaAdapation
   }
 
   public get glycemiaAdaptation() {
@@ -25,7 +63,7 @@ export class PuntualAdaptationResult {
   }
 
   public get totalAdaptation() {
-    return this.acetoneAdaptation + this.glycemiaAdaptation
+    return this._totalAdaptation
   }
 
   public get checkAcetone() {
@@ -34,11 +72,12 @@ export class PuntualAdaptationResult {
 }
 
 export class QuickInsulin {
-  computePunctualAdaptation(
+  
+  public computePunctualAdaptation(
     glycemiaLevel: number,
     acetoneLevel?: number,
   ): PuntualAdaptationResult {
-    let glycemiaCondition = conditions.find(element => {
+    let glycemiaCondition = punctualAdaptationCriteria.find(element => {
       let min = element.min == null ? Number.MIN_VALUE : element.min
       let max = element.max == null ? Number.MAX_VALUE : element.max
 
@@ -57,7 +96,7 @@ export class QuickInsulin {
 
     let acetoneAdaptation = 0
 
-    if (acetoneLevel != null) {
+    if (acetoneLevel !== undefined) {
       let acetone = new Acetone()
       acetoneAdaptation = acetone.computeAdaptation(acetoneLevel)
     }
@@ -70,6 +109,23 @@ export class QuickInsulin {
         : glycemiaCondition.checkAcetone,
     )
   }
+
+  public computeLongtermAdaptation = (
+    glycemiaIntervals: MealGlycemiaMeasure[],
+  ): number => {
+    let trendService = new TrendService()
+    let trend = trendService.findTrend(glycemiaIntervals)
+    let result = longtermAdaptationCriteria.find(c => c.trend === trend)
+    if (!result) {
+      throw new Error(`No result found for trend ${trend}`)
+    }
+    return result.adaptation
+  }
+
+  findObjectiveCriterion = () => {
+    return punctualAdaptationCriteria.find(c => c.objective)
+  }
+
 }
 
 export class AcetoneNeededError extends Error {

@@ -20,4 +20,8 @@ export class Acetone {
 
     return this.acetoneAdaptationByLevel.get(acetoneLevel)
   }
+
+  getAcetoneLevels(): number[] {
+    return acetoneCriteria.map(ac => ac.level)
+  }
 }

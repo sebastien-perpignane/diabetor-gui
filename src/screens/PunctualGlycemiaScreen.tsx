@@ -16,6 +16,8 @@ import {
 } from '../core/QuickInsulin'
 import {DbNumericTextInput} from '../components/DbNumericTextInputComponent'
 import {screenStyles} from './styles'
+import {Acetone} from '../core/Acetone'
+import {SegmentedButtons} from 'react-native-paper'
 
 interface PunctualGlycemiaState {
   glycemiaLevel: number | undefined
@@ -58,7 +60,6 @@ export class PunctualGlycemiaScreen extends React.Component<
   }
 
   private setGlycemiaLevel = (glycemiaLevel: number | undefined): void => {
-    console.log('setting glycemia level')
     this.setState({
       glycemiaLevel: glycemiaLevel,
     })
@@ -119,7 +120,7 @@ export class PunctualGlycemiaScreen extends React.Component<
   }
 
   private manageNumberInput = (strValue: string): number | undefined => {
-    if (!strValue) {
+    if (strValue === '') {
       return undefined
     }
     let numberValue: number = Number(strValue)
@@ -156,6 +157,16 @@ export class PunctualGlycemiaScreen extends React.Component<
       backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
     }
 
+    const acetoneLevels = new Acetone().getAcetoneLevels().map(i => {
+      return {
+        label: i === 0 ? '0' : '+'.repeat(i),
+        value: i.toString(),
+        style: {color: 'white', backgroundColor: 'gray'},
+        checkedColor: 'blue',
+        testID: `acetoneLevel${i}`,
+      }
+    })
+
     return (
       <SafeAreaView style={screenStyles.screenBackground}>
         <StatusBar
@@ -177,11 +188,14 @@ export class PunctualGlycemiaScreen extends React.Component<
           {this.state.visibleAcetone && (
             <View>
               <Text>Acetone level:</Text>
-              <DbNumericTextInput
-                id="acetone"
-                placeholder="Enter acetone level"
-                onChangeText={newText => this.manageAcetoneLevelInput(newText)}
-                testID="acetoneInput"
+              <SegmentedButtons
+                buttons={acetoneLevels}
+                value={
+                  this.state.acetoneLevel
+                    ? this.state.acetoneLevel.toString()
+                    : '0'
+                }
+                onValueChange={nexText => this.manageAcetoneLevelInput(nexText)}
               />
             </View>
           )}
@@ -194,7 +208,7 @@ export class PunctualGlycemiaScreen extends React.Component<
             </View>
           )}
 
-          {this.state.punctualAdaptationResult != null && (
+          {this.state.punctualAdaptationResult && (
             <View>
               <Text testID="resultDetails">
                 {this.formatResult(this.state.punctualAdaptationResult)}
