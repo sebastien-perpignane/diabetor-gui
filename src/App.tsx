@@ -12,6 +12,7 @@ import {NavigationContainer} from '@react-navigation/native'
 import {PunctualGlycemiaScreen} from './screens/PunctualGlycemiaScreen'
 import {HomeScreen} from './screens/HomeScreen'
 import {BasalAdaptationScreen} from './screens/BasalAdaptationScreen'
+import {QuickInsulinAdaptationScreen} from './screens/QuickInsulinAdaptationScreen'
 
 const Stack = createNativeStackNavigator()
 
@@ -23,6 +24,10 @@ function App(): JSX.Element {
         <Stack.Screen
           name="Punctual quick adaptation"
           component={PunctualGlycemiaScreen}
+        />
+        <Stack.Screen
+          name="Long term quick adaptation"
+          component={QuickInsulinAdaptationScreen}
         />
         <Stack.Screen name="Basal" component={BasalAdaptationScreen} />
       </Stack.Navigator>

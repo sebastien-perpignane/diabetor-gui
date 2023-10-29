@@ -16,6 +16,13 @@ export function HomeScreen({navigation}: any): JSX.Element {
             }}
           />
           <DbButton
+            title="Long term quick adaptation"
+            testID="longterm"
+            onPress={() => {
+              navigation.navigate('Long term quick adaptation')
+            }}
+          />
+          <DbButton
             title="Basal adaptation"
             testID="basal"
             onPress={() => {

@@ -41,3 +41,11 @@ it('navigates well to basal screen', () => {
   let basalElement = screen.getByTestId('basal')
   fireEvent(basalElement, 'onPress')
 })
+
+it('navigates well to longterm quick adaptation screen', () => {
+  const SampleApp = () => <App />
+
+  render(<SampleApp />)
+  let longtermElement = screen.getByTestId('longterm')
+  fireEvent(longtermElement, 'onPress')
+})
