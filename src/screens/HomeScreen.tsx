@@ -29,6 +29,13 @@ export function HomeScreen({navigation}: any): JSX.Element {
               navigation.navigate('Basal')
             }}
           />
+          <DbButton
+            title="Settings"
+            testID="settings"
+            onPress={() => {
+              navigation.navigate('Settings')
+            }}
+          />
         </View>
       </ScrollView>
     </SafeAreaView>

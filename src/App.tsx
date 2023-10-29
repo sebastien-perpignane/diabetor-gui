@@ -13,6 +13,7 @@ import {PunctualGlycemiaScreen} from './screens/PunctualGlycemiaScreen'
 import {HomeScreen} from './screens/HomeScreen'
 import {BasalAdaptationScreen} from './screens/BasalAdaptationScreen'
 import {QuickInsulinAdaptationScreen} from './screens/QuickInsulinAdaptationScreen'
+import { SettingsScreen } from './screens/SettingsScreen'
 
 const Stack = createNativeStackNavigator()
 
@@ -30,6 +31,7 @@ function App(): JSX.Element {
           component={QuickInsulinAdaptationScreen}
         />
         <Stack.Screen name="Basal" component={BasalAdaptationScreen} />
+        <Stack.Screen name="Settings" component={SettingsScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   )
