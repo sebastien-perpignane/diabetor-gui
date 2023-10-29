@@ -86,14 +86,14 @@ export class BasalAdaptationScreen extends React.Component<{}, BasalState> {
         <View key={i} style={screenStyles.intervalContainer}>
           <Text style={screenStyles.intervalLabel}>Interval {i + 1}: </Text>
           <DbNumericTextInput
-            testID={'glycmiaBeforeInput' + (i +1) }
+            testID={'glycemiaBeforeInput' + (i + 1)}
             placeholder={'glycemia before ' + (i + 1)}
             onChangeText={newtText => {
               manageGlycemiaBefore(i, newtText)
             }}
           />
           <DbNumericTextInput
-            testID={'glycmiaAfterInput' + (i +1) }
+            testID={'glycemiaAfterInput' + (i + 1)}
             placeholder={'glycemia after ' + (i + 1)}
             onChangeText={newtText => {
               manageGlycemiaAfter(i, newtText)
@@ -107,18 +107,17 @@ export class BasalAdaptationScreen extends React.Component<{}, BasalState> {
       <SafeAreaView style={screenStyles.screenBackground}>
         <View>
           {glycemiaIntervalInputs}
-          {this.state.adaptation !== undefined && <View>
-            <Text testID='adaptationResult' style={componentStyles.dbTextInput}>
-              {this.state.adaptation}
-            </Text>
-          </View>}
+          {this.state.adaptation !== undefined && (
+            <View>
+              <Text
+                testID="adaptationResult"
+                style={componentStyles.dbTextInput}>
+                {this.state.adaptation}
+              </Text>
+            </View>
+          )}
         </View>
       </SafeAreaView>
     )
   }
 }
-
-// interface NightGlycemiaInterval {
-//   glycemiaBefore: number
-//   glycemiaAfter: number
-// }
